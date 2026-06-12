@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title></title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" data-manual></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/lib/marked.umd.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</head>
+<body>
+<div id="markdown">
+
+# Sleek
+A statically-typed, sleek, ergonomic, expressive, and modern programming language designed for clarity and performance.
+
+> Currently in early development (work in progress), so expect breaking changes and incomplete features. The design is still evolving, and feedback is welcome!
+
+## Extension
+All sleek files have the `.sl` extension.
+
+## Syntax
+Sleek's syntax is designed to be *sleek*, clean and intuitive, drawing inspiration from popular and industry-standard languages.
+
+<details>
+  <summary><md>### Comments</md></summary>
+  <br/>
+  <md>
+  C-styled comments, with single-line comments using `//` and multi-line comments enclosed in `/* */`.
+  ```sleek
+  // This is a single-line comment
+  /*
+    This is a 
+    multi-line comment
+  */
+  ```
+  </md>
+</details>
+
+<details>
+  <summary><md>### Variables</md></summary>
+  <br/>
+  <md>
+  Variables in Sleek are declared using `let` or `const`.
+  ```sleek
+  let x = 5; // mutable integer
+  x = 10; // allowed
+  const y = 10.5; // immutable float
+  y = 20.5; // error: cannot reassign to constant variable
+  ```
+  </md>
+  <md>
+    But wait, Sleek was supposed to be statically-typed!
+  </md>
+  <md>
+    The above example is actually an example of type inference, where the compiler automatically matches the type based on the assigned value. Isn't that *sleek*?
+  </md>
+  <md>
+  However, if you want to explicitly specify the type,
+  be my guest!
+  ```sleek
+  let int x = 5; // mutable integer
+  const float y = 10.5; // immutable float
+  ```
+  </md>
+</details>
+
+<details>
+  <summary><md>### Functions</md></summary>
+  <br/>
+  <md>
+  Functions in Sleek are declared using the `fn` keyword.
+  ```sleek
+  fn add(int a, int b) {
+    return a + b;
+  }
+  <wbr/>
+  fn main() {
+    let result = add(5, 10);
+    println(result); // Output: 15
+  }
+  ```
+  </md>
+  <md>
+  And I don't know if you noticed, 
+  but the `add` function has an implicit return type of `int`,
+  and the `main` function returns `null`, which is inferred from the return statement (which ironically doesn't exist).
+  </md>
+  <md>
+    Sleek's type inference is pretty powerful, isn't it?
+  </md>
+  <md>
+  But of course, you can also explicitly specify the return type if you want.
+  ```sleek
+  fn int add(int a, int b) {
+    return a + b;
+  }
+  <wbr/>
+  fn void main() {
+    let result = add(5, 10);
+    println(result); // Output: 15
+  }
+  ```
+  </md>
+</details>
+
+
+<details>
+  <summary><md>### Control Flow</md></summary>
+  <br/>
+  <md>
+  Sleek supports standard control flow constructs like `if`, `else`, `while`, and `for`.
+  ```sleek
+  fn main() {
+    let x = 10;
+    if (x > 5) {
+      println("x is greater than 5");
+    } else {
+      println("x is less than or equal to 5");
+    }
+  <wbr/>
+    let i = 0;
+    while (i < 5) {
+      println(i);
+      i = i + 1;
+    }
+  <wbr/>
+    for (let j = 0; j < 5; j++) {
+      println(j);
+    }
+  }
+  ```
+</details>
+
+<details>
+  <summary><md>### Arrays</md></summary>
+  <br/>
+  <md>
+  Arrays in Sleek are declared using square brackets `[]`.
+  </md>
+  <md>
+  ### Fixed arrays :
+  ```sleek
+  fn main() {
+    let arr = [1, 2, 3, 4, 5]; // int[5] = int[capacity], with 5 elements initialized
+    println(arr); // Output: [1, 2, 3, 4, 5]
+    <wbr/>
+    // would be error: cannot push beyond the fixed capacity
+    // arr.push(6);
+    arr.remove(2); // removes the element at index 2 (value 3)
+    arr.push(6); // now possible since there is capacity
+    println(arr); // Output: [1, 2, 4, 5, 6]
+    println(arr.length == arr.capacity); // Output: true
+    <wbr/>
+    // explicit size
+    let arr2[10] = [1, 2] // int[10] with 2 elements initialized
+    println(arr2); // Output: [1, 2]
+    println(arr2[5]); // Output: null
+    println(arr2.length < arr2.capacity); // Output: true
+    <wbr/>
+  }
+  ```
+  ### Dynamic arrays :
+  ```sleek
+  fn main() {
+    let arr[] = [1, 2, 3]; // int[] with 3 elements
+    println(arr); // Output: [1, 2, 3]
+    println(arr.length, arr.capacity); // Output: 3, -1 (capacity is -1 for dynamic arrays)
+    <wbr/>
+    arr.push(4); // dynamically resizes the array to accommodate the new element
+    println(arr); // Output: [1, 2, 3, 4]
+    arr.remove(1); // removes the element at index 1 (value 2)
+    println(arr); // Output: [1, 3, 4]
+  }
+  ```
+  ### Const arrays :
+  ```sleek
+  fn main() {
+    const arr3 = [1, 2, 3]; // const int[3]
+    println(arr3); // Output: [1, 2, 3]
+    <wbr/>
+    arr3[0] = 10; // error: cannot modify a constant array
+    arr3.remove(1); // error: cannot modify a constant array
+    arr3.push(4); // error: cannot modify a constant array
+    <wbr/>
+    const arr[] = [1, 2, 3]; // error: constant arrays cannot be dynamic
+  }
+  ```
+  ### References to arrays :
+  ```sleek
+  fn main() {
+    let arr0 = [1, 2, 3]; // int[3] with 3 elements
+    let arr1[] = [1, 2, 3]; // int[] with 3 elements
+    <wbr/>
+    let &ref0 = arr0; // &int[3]
+    let &ref1 = arr1; // &int[]
+    <wbr/>
+    ref0[0] = 10; // modifies arr0 since ref0 is just a reference
+    println(arr0); // Output: [10, 2, 3]
+    println(ref0); // Output: [10, 2, 3]
+    <wbr/>
+    ref1.push(10); // modifies arr1 since ref1 is just a reference
+    println(arr1); // Output: [1, 2, 3, 10]
+    println(ref1); // Output: [1, 2, 3, 10]
+  }
+  ```
+  </md>
+  <md>
+  ### Const references to arrays :
+  ```sleek
+  fn main() {
+    let arr0 = [1, 2, 3]; // int[3] with 3 elements
+    let arr1[] = [4, 5, 6]; // int[] with 3 elements
+    <wbr/>
+    const &ref0 = arr0; // const &int[3]
+    println(ref0); // Output: [1, 2, 3]
+    arr0[0] = 10;
+    println(ref0); // Output: [10, 2, 3] (reflects changes to arr0)
+    <wbr/>
+    const &ref1 = arr1; // const &int[]
+    println(ref1); // Output: [4, 5, 6]
+    arr1.push(10);
+    println(ref1); // Output: [4, 5, 6, 10] (reflects changes to arr1)
+    <wbr/>
+    ref0[0] = 20; // error: cannot modify through a const reference
+    ref1.push(20); // error: cannot modify through a const reference
+    <wbr/>
+    // Const reference to const array delegates to a const reference
+    const arr2 = [7, 8, 9]; // const int[3]
+    const ref2 = arr2; // const int[3]
+    const &ref2 = arr2; // const &int[3]
+  }
+  ```
+  </md>
+  <md>
+  ### Copying arrays :
+  Since references are handled explicitly in Sleek, copying an array is just as simple as assigning it.
+  ```sleek
+  let arr0 = [1, 2, 3]; // int[3] with 3 elements
+  let arr1 = arr0; // Creates an independent copy of arr0
+  <wbr/>
+  arr1[0] = 10; // Modifying arr1 does not affect arr
+  println(arr0); // Output: [1, 2, 3]
+  println(arr1); // Output: [10, 2, 3]
+  ```
+  </md>
+</details>
+
+<details>
+  <summary><md>### Null safety</md></summary>
+  <br/>
+  <md>
+  Sleek has built-in null safety features to prevent null reference errors. By default, all types are non-nullable, meaning they cannot hold a null value. If you want a variable to be able to hold null, you can use the `?` syntax to make it nullable.
+  ```sleek
+  let int nullableInt?; // nullable integer
+  println(nullableInt); // Output: null
+  nullableInt = 10; // now holds a non-null value
+  println(nullableInt); // Output: 10
+  <wbr/>
+  let nullable? = 10; // (same as above, via inference)
+  println(nullable); // Output: 10
+  nullable = null; // now holds a null value
+  println(nullable); // Output: null
+  <wbr/>
+  // Non-nullable types cannot be assigned null
+  let int nonNullableInt = null; // error: cannot assign null to a non-nullable type
+  ```
+  </md>
+  <md>
+  ### Null safety with arrays :
+  ```sleek
+  int arr[] = [1, 2, 3]; // non-nullable array of non-nullable integers
+  println(arr[0]); // Output: 1
+  <wbr/>
+  arr = null; // error: cannot assign null to a non-nullable type
+  arr[0] = null; // error: cannot assign null to a non-nullable type
+  <wbr/>
+  int nullable?[] = [1, 2, 3]; // nullable array of non-nullable integers
+  println(nullable?[0]); // Output: 1
+  <wbr/>
+  arr = null; // now arr can hold null
+  println(nullable?[0]); // Output: null (delegates to null since the array itself is null)
+  nullable?[0] = null; // error: cannot assign null to a non-nullable type
+  <wbr/>
+  int fullNullable??[] = [1, 2, 3]; // nullable array of nullable integers
+  println(fullNullable?[0]); // Output: 1
+  <wbr/>
+  fullNullable?[0] = null; // now the element at index 0 can hold null
+  println(fullNullable); // Output: [null, 2, 3]
+  <wbr/>
+  fullNullable = null; // now the array itself can hold null
+  println(fullNullable); // Output: null
+  ```
+  </md>
+</details>
+
+</div>
+  <script src="script.js"></script>
+</body>
+</html>
