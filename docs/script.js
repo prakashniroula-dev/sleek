@@ -4,14 +4,100 @@ Prism.languages.sleek = {
     pattern: /(\/\/.*|\/\*[\s\S]*?\*\/)/,
     greedy: true,
   },
+  method: {
+    pattern: /(\.)\s*\w+(?=\s*\()/, // dot + word followed by '('
+    greedy: true,
+    lookbehind: true,
+    alias: "function-name", // reuse function styling, or use 'method'
+  },
+  property: [
+    {
+      pattern: /(?<!\w)\w+(?=\s*:)/, // matches property names before a colon,
+      greedy: true,
+    },
+    {
+      pattern: /(\.)\s*\w+(?!\s*\()/, // dot + word NOT followed by '('
+      greedy: true,
+      lookbehind: true,
+    },
+  ],
+  customTypes: [
+    {
+      pattern: /(\b(?:struct|union)\b\s*)(\w+)\b/,
+      lookbehind: true,
+      inside: {
+        'class-name': {
+          pattern: /\b\w+\b/,
+          greedy: true,
+        }
+      }
+    }
+  ],
+  'class-name': {
+    pattern: /\b[A-Z][a-zA-Z0-9_]*\b/,
+    greedy: true
+  },
   // Keywords
   keyword: {
-    pattern:
-    RegExp(`\\b(?:${[
-      "fn", "let", "const", "var", "if", "else", "while", "for", "in", "return",
-      "break", "continue", "match", "case", "default", "struct", "enum",
-      "trait", "impl", "mod", "use", "pub", "as", "async", "await", "int", "float", "void", "bool", "string", "null", "char", "byte"
-    ].join("|")})\\b`),
+    pattern: RegExp(
+      `\\b(?:${[
+        "fn",
+        "let",
+        "const",
+        "var",
+        "if",
+        "else",
+        "while",
+        "for",
+        "in",
+        "return",
+        "break",
+        "continue",
+        "throw",
+        "try",
+        "catch",
+        "finally",
+        "match",
+        "case",
+        "default",
+        "struct",
+        "enum",
+        "alias",
+        "type",
+        "union",
+        "typeof",
+        "sizeof",
+        "import",
+        "typestr",
+        "export",
+        "tag",
+        "trait",
+        "impl",
+        "mod",
+        "use",
+        "pub",
+        "as",
+        "async",
+        "await",
+        "int16",
+        "int32",
+        "int64",
+        "uint16",
+        "uint32",
+        "uint64",
+        "int",
+        "uint",
+        "float32",
+        "float64",
+        "float",
+        "void",
+        "bool",
+        "string",
+        "null",
+        "char",
+        "byte",
+      ].join("|")})\\b`,
+    ),
     greedy: true,
   },
   // Numbers
@@ -21,22 +107,28 @@ Prism.languages.sleek = {
   },
   // Double-quoted strings
   string: {
-    pattern: /"[^"]*"/,
+    pattern: /"(\\.|[^"\\])*"/,
     greedy: true,
+    inside: {
+      tag: {
+        pattern: /\{\}/,
+        greedy: true,
+      },
+    },
   },
   // Operators
   operator: {
     pattern: /[=!<>]+/,
     greedy: true,
   },
-  function: {
+  
+  "function-name": {
     pattern: /\b\w+(?=\s*\()/,
     greedy: true,
-  }
+  },
 };
 
-
-
+console.log(Prism.languages.javascript)
 
 const markdownText = document.getElementById("markdown").innerHTML;
 console.log(markdownText);
@@ -62,8 +154,13 @@ function processMarkdown(main) {
   let count = 0;
   for (const detail of details) {
     count++;
-    let hash = detail.querySelector("summary").textContent.trim().toLowerCase().replace(/\s+/g, '-');
-    const is_closed = localStorage.getItem('details-closed-' + hash) === 'open' ? false : true;
+    let hash = detail
+      .querySelector("summary")
+      .textContent.trim()
+      .toLowerCase()
+      .replace(/\s+/g, "-");
+    const is_closed =
+      localStorage.getItem("details-closed-" + hash) === "open" ? false : true;
     detail.dataset.hash = hash;
     if (is_closed) {
       detail.removeAttribute("open");
@@ -73,9 +170,9 @@ function processMarkdown(main) {
     detail.addEventListener("toggle", () => {
       let hash = detail.dataset.hash;
       if (detail.open) {
-        localStorage.setItem('details-closed-' + hash, 'open');
+        localStorage.setItem("details-closed-" + hash, "open");
       } else {
-        localStorage.setItem('details-closed-' + hash, 'closed');
+        localStorage.setItem("details-closed-" + hash, "closed");
       }
     });
   }
@@ -87,7 +184,7 @@ const highlight = () => {
     Prism.highlightAllUnder(markdown);
   }
   setTimeout(initCodeCopy, 200);
-}
+};
 
 highlight();
 setTimeout(() => {
@@ -203,8 +300,8 @@ function initCodeCopy() {
 function getRawHTMLFromString(htmlString) {
   // Parse the HTML string into a document fragment
   const parser = new DOMParser();
-  const doc = parser.parseFromString(htmlString, 'text/html');
-  
+  const doc = parser.parseFromString(htmlString, "text/html");
+
   // Recursively walk the DOM and rebuild the HTML with decoded text
   function build(node) {
     if (node.nodeType === Node.TEXT_NODE) {
@@ -213,22 +310,22 @@ function getRawHTMLFromString(htmlString) {
     }
     if (node.nodeType === Node.ELEMENT_NODE) {
       const tag = node.tagName.toLowerCase();
-      let inner = '';
+      let inner = "";
       for (const child of node.childNodes) {
         inner += build(child);
       }
       // Self-closing tags? Handle if needed (void elements)
-      const voidTags = new Set(['br', 'hr', 'img', 'input', 'meta', 'link']);
+      const voidTags = new Set(["br", "hr", "img", "input", "meta", "link"]);
       if (voidTags.has(tag)) {
         return `<${tag}>`;
       }
       return `<${tag}>${inner}</${tag}>`;
     }
     // Ignore comments, etc.
-    return '';
+    return "";
   }
-  
-  let result = '';
+
+  let result = "";
   for (const child of doc.body.childNodes) {
     result += build(child);
   }

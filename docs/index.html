@@ -42,6 +42,34 @@ Sleek's syntax is designed to be *sleek*, clean and intuitive, drawing inspirati
 </details>
 
 <details>
+  <summary><md>### Primitives</md></summary>
+  <md>
+  ### Integer family :
+  * `int16` : 16-bit signed integer (-32,768 to 32,767)
+  * `int32` : 32-bit signed integer (-2,147,483,648 to 2,147,483,647)
+  * `int64` : 64-bit signed integer (-9,223,372,036,854,775,808 to 9,223,372,036,854,775,807)
+  * `int` : alias for `int32`
+  <wbr/>
+  ### Unsigned integer family :
+  * `uint16` : 16-bit unsigned integer (0 to 65,535)
+  * `uint32` : 32-bit unsigned integer (0 to 4,294,967,295)
+  * `uint64` : 64-bit unsigned integer (0 to 18,446,744,073,709,551,615)
+  * `uint` : alias for `uint32`
+  ### Floating-point family :
+  * `float32` : 32-bit floating-point number (single precision)
+  * `float64` : 64-bit floating-point number (double precision)
+  * `float` : alias for `float32`
+  ### Other primitives :
+  * `bool` : boolean type (true or false)
+  * `string` : string type (UTF-8 encoded)
+  * `char` : character type (UTF-8 encoded)
+  * `byte` : byte type (8-bit unsigned integer)
+  * `void` : represents the absence of a value (used for functions that do not return anything)
+  * `null` : represents the absence of a value (can be assigned to nullable types)
+  </md>
+</details>
+
+<details>
   <summary><md>### Variables</md></summary>
   <br/>
   <md>
@@ -64,7 +92,8 @@ Sleek's syntax is designed to be *sleek*, clean and intuitive, drawing inspirati
   be my guest!
   ```sleek
   let int x = 5; // mutable integer
-  const float y = 10.5; // immutable float
+  const float64 y = 10.5; // immutable float
+  let byte b = 255; // mutable byte
   ```
   </md>
 </details>
@@ -248,6 +277,11 @@ Sleek's syntax is designed to be *sleek*, clean and intuitive, drawing inspirati
   println(arr1); // Output: [10, 2, 3]
   ```
   </md>
+  <md>
+    Phew, that was quite a bit, who thought arrays could be so complex !
+    <br/>
+    but if you try it out, you'll see how intuitively *sleek*, powerful and flexible it is.
+  </md>
 </details>
 
 <details>
@@ -294,6 +328,119 @@ Sleek's syntax is designed to be *sleek*, clean and intuitive, drawing inspirati
   <wbr/>
   fullNullable = null; // now the array itself can hold null
   println(fullNullable); // Output: null
+  ```
+  </md>
+</details>
+
+<details>
+  <summary><md>### Unions, Struct & Enums</md></summary>
+  <br/>
+  Unions, structs, and enums are powerful features in Sleek that allow you to define types that can hold multiple different values.
+  Unions allow a variable to hold one of several types,
+  structs allow you to define a custom data structure with named fields,
+  while enums allow you to define a type that can be one of several named variants.
+  <md>
+  ### Unions
+  ```sleek
+  union MyType[int, string]; // MyType can be either an int or a string
+  <wbr/>
+  fn main() {
+    let MyType x = 10;
+    let MyType y = "hello";
+    <wbr/>
+    println("x is an int: {}", tag(x) == int); // Output: true
+    println("y is a string: {}", tag(y) == string); // Output: true
+    println("x: {}, y: {}", x, y); // Output: x: 10, y: hello
+    <wbr/>
+    // expression to handle different variants of the union
+    match x {
+      int i => println("x is an int: {}", i+1);
+      string s => println("x is a string: {}", s + " world");
+    };
+  }
+  ```
+  </md>
+  <md>
+  ### Structs
+  ```sleek
+  struct Point {
+    int x;
+    int y;
+    fn move(Point &self, int dx, int dy) {
+      self.x += dx;
+      self.y += dy;
+    }
+  }
+  fn main() {
+    let Point p = { x: 10, y: 20 };
+    println("Point p: ({}, {})", p.x, p.y);
+    <wbr/>
+    let x = Point { x: 5, y: 5 };
+    println("Point x: ({}, {})", x.x, x.y);
+    x.move(5, 5);
+    println("Point x after moving: ({}, {})", x.x, x.y);
+  }
+  ```
+  </md>
+  <md>
+  ### Enums
+  ```sleek
+  // type can be omitted : inferred from the variants
+  enum Color[int, string] {
+    Red = 1,
+    Green = 2,
+    Blue = 3,
+    Magenta = "magenta",
+    Cyan = "cyan",
+    <wbr/>
+    // function bound to the enum itself (static method)
+    fn Color::fromHex(string hex) {
+      let color = match hex {
+        "#ff0000" => Red;
+        "#00ff00" => Green;
+        "#0000ff" => Blue;
+        "#ff00ff" => Magenta;
+        "#00ffff" => Cyan;
+        default => throw Error::ValueError("Invalid hex color");
+      };
+      return color;
+    }
+    <wbr/>
+    // functions bound to the enum variants (instance methods)
+    fn fromHex(Color &self, string hex) {
+      let color = Color::fromHex(hex);
+      self = color;
+    }
+    <wbr/>
+    fn toHex(Color &self) {
+      let hex = match self {
+        Red => "#ff0000";
+        Green => "#00ff00";
+        Blue => "#0000ff";
+        Magenta => "#ff00ff";
+        Cyan => "#00ffff";
+      };
+      return hex;
+    }
+  }
+  <wbr/>
+  fn main() {
+    let c = Color::fromHex("#ff0000");
+    println("Color c: {}", c); // Output: Color c: Red(1)
+    println("Hex of c: {}", c.toHex()); // Output: Hex of c: #ff0000
+    <wbr/>
+    c.fromHex("#00ff00");
+    println("Color c: {}", c); // Output: Color c: Green(2)
+    <wbr/>
+    c = Color::Magenta;
+    println("Color c: {}", c); // Output: Color c: Magenta("magenta")
+    <wbr/>
+    match c {
+      Color::Red => println("c is red");
+      Color::Green => println("c is green");
+      default => println("c is some other color: {}", default);
+    };
+  }
   ```
   </md>
 </details>
