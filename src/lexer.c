@@ -63,7 +63,7 @@ static void sleek_next_char()
   current_char = *source;
 }
 
-static void sleek_move_source(char *newptr)
+static void sleek_move_source(const char *newptr)
 {
   size_t diff = newptr - source;
   source = newptr;
@@ -91,7 +91,7 @@ bool sleek_lex_number(sleek_tok *dest)
     return false;
   sleek_move_source(endptr);
   tok.type = sleek_tok_type_literal;
-  tok.data.literal.type = sleek_literal_type_int64;
+  tok.data.literal.type = sleek_args_type_int64;
   tok.data.literal.data._int64 = data;
   *dest = tok;
   return true;
@@ -163,7 +163,7 @@ bool sleek_lex_string(sleek_tok *dest)
   size_t len = end - source;
   
   tok.type = sleek_tok_type_literal;
-  tok.data.literal.type = sleek_literal_type_string;
+  tok.data.literal.type = sleek_args_type_string;
   tok.data.literal.data._string.ptr = source;
   tok.data.literal.data._string.length = len;
   
@@ -185,6 +185,7 @@ bool sleek_lex_symbol(sleek_tok *dest)
       {")", sleek_symbol_type_parantheses_r},
       {"{", sleek_symbol_type_braces_l},
       {"}", sleek_symbol_type_braces_r},
+      {",", sleek_symbol_type_comma},
       {";", sleek_symbol_type_semicolon},
       {"\"", sleek_symbol_type_dblquote},
       {NULL, -1}};
@@ -339,6 +340,7 @@ sleek_tok sleek_peek_token(int idx)
   }
 }
 
+
 void sleek_advance_token(void)
 {
   if (!tok_current_valid)
@@ -365,4 +367,31 @@ void sleek_advance_token(void)
     tok_current = sleek_lex_token();
   }
   tok_current_valid = true;
+}
+
+void sleek_advance_token_by(int count)
+{
+  if (count < 0)
+  {
+    sleek_error("cannot advance token by negative count: %d", count);
+    return;
+  }
+  for (int i = 0; i < count; i++)
+  {
+    sleek_advance_token();
+  }
+}
+
+void sleek_lex_reset()
+{
+  source = NULL;
+  current_char = '\0';
+  source_len = 0;
+  errptr = NULL;
+  tok_current_valid = false;
+  tok_next_buf_len = 0;
+  tok_next_write_idx = 0;
+  tok_next_read_idx = 0;
+  tok_prev_buf_len = 0;
+  tok_prev_write_idx = 0;
 }

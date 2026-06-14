@@ -23,7 +23,7 @@ fn main() {
   - [x] symbols - `(){};"`
   - [x] identifiers - `print` | `main`
 
-- [ ] Parser - parse to AST
+- [x] Parser - parse to AST
 
 ```yaml
 # AST preview
