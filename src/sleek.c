@@ -54,10 +54,9 @@ void print_sleek_ast(sleek_ast_node* node, int level) {
     print_space_level(level + 1);
     printf("name: %.*s\n", (int)node->data.fn_call.fn_name.length, node->data.fn_call.fn_name.ptr);
     print_space_level(level + 1);
-    printf("argc: %zu\n", node->data.fn_call.arg_count);
     print_space_level(level + 1);
     printf("args:\n");
-    struct sleek_ast_call_args* arg = node->data.fn_call.args;
+    struct sleek_args* arg = node->data.fn_call.args;
     int arg_index = 0;
     while (arg != NULL) {
       print_space_level(level + 2);
@@ -104,7 +103,7 @@ void lexerTest() {
 void parserTest() {
   const char* code = 
   "fn main() {\n"
-  "  printf(\"Hello Sleek\");"
+  "  printf(\"Hello Sleek\", 5);"
   "}"
   ;
 

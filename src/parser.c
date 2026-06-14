@@ -33,7 +33,6 @@ static bool arena_attempt_backtrack(size_t size, void *end)
   return true;
 }
 
-
 void consume_token(int count)
 {
   sleek_advance_token_by(count);
@@ -65,18 +64,19 @@ bool match_token(enum sleek_tok_type type)
   return true;
 }
 
-struct sleek_args sleek_parse_args()
+struct sleek_args* sleek_parse_args()
 {
-  struct sleek_args args = {0};
   sleek_tok tok = sleek_peek_token(0);
   if (tok.type != sleek_tok_type_symbol || tok.data.symbol.type != sleek_symbol_type_parantheses_l)
   {
     sleek_error("Expected '(' at start of argument list");
-    return args;
+    return NULL;
   }
   consume_token(1); // consume '('
   tok = sleek_peek_token(0);
   bool needs_comma = false;
+  struct sleek_args *root = NULL;
+  struct sleek_args *cur = NULL;
   while (!(tok.type == sleek_tok_type_symbol && tok.data.symbol.type == sleek_symbol_type_parantheses_r))
   {
     if (needs_comma)
@@ -84,7 +84,7 @@ struct sleek_args sleek_parse_args()
       if (tok.type != sleek_tok_type_symbol || tok.data.symbol.type != sleek_symbol_type_comma)
       {
         sleek_error("Expected ',' between arguments");
-        return args;
+        return NULL;
       }
       consume_token(1); // consume ','
       tok = sleek_peek_token(0);
@@ -92,22 +92,33 @@ struct sleek_args sleek_parse_args()
     if (tok.type != sleek_tok_type_literal)
     {
       sleek_error("Expected literal argument");
-      return args;
+      return NULL;
     }
-    if (args.type == sleek_args_type_none)
+
+    struct sleek_args *new_arg = arena_alloc(sizeof(struct sleek_args));
+    new_arg->type = tok.data.literal.type;
+    new_arg->data = arena_alloc(sizeof(sleek_ast_node));
+    new_arg->data->type = sleek_ast_node_type_literal;
+    new_arg->data->data.literal.type = tok.data.literal.type;
+    new_arg->data->data.literal.data = tok.data.literal.data;
+    new_arg->next = NULL;
+    if ( root == NULL )
     {
-      args.type = tok.data.literal.type;
-      args.data = arena_alloc(sizeof(sleek_ast_node));
-      args.data->type = sleek_ast_node_type_literal;
-      args.data->data.literal.type = tok.data.literal.type;
-      args.data->data.literal.data = tok.data.literal.data;
+      root = new_arg;
+      cur = new_arg;
     }
+    else
+    {
+      cur->next = new_arg;
+      cur = new_arg;
+    }
+
     consume_token(1); // consume literal
     needs_comma = true;
     tok = sleek_peek_token(0);
   }
   consume_token(1); // consume ')'
-  return args;
+  return root;
 }
 
 sleek_ast_node *sleek_parse_stmt()
@@ -122,23 +133,10 @@ sleek_ast_node *sleek_parse_stmt()
     consume_token(1); // consume identifier
     tok = sleek_peek_token(0);
     sleek_log("Peeking token after consuming identifier: type=%d, %d", tok.type, tok.data.symbol.type);
-    struct sleek_args args = sleek_parse_args();
     sleek_ast_node *node = arena_alloc(sizeof(sleek_ast_node));
     node->type = sleek_ast_node_type_fn_call;
     node->data.fn_call.fn_name = fn_name;
-    node->data.fn_call.arg_count = args.type == sleek_args_type_none ? 0 : 1;
-    if (args.data != NULL)
-    {
-      struct sleek_ast_call_args *call_arg = arena_alloc(sizeof(struct sleek_ast_call_args));
-      call_arg->type = args.type;
-      call_arg->data = args.data;
-      call_arg->next = NULL;
-      node->data.fn_call.args = call_arg;
-    }
-    else
-    {
-      node->data.fn_call.args = NULL;
-    }
+    node->data.fn_call.args = sleek_parse_args();
     tok = sleek_peek_token(0);
     if (tok.type == sleek_tok_type_symbol && tok.data.symbol.type == sleek_symbol_type_semicolon)
     {
@@ -236,7 +234,7 @@ sleek_ast_node *sleek_parse_fn_defn()
   node->type = sleek_ast_node_type_fn_defn;
   node->data.fn_defn.fn_name = fn_name;
   node->data.fn_defn.return_type = sleek_args_type_void; // TODO: parse return type
-  node->data.fn_defn.body = sleek_parse_block(); // TODO: parse function body
+  node->data.fn_defn.body = sleek_parse_block();         // TODO: parse function body
   return node;
 }
 

@@ -48,16 +48,9 @@ struct sleek_ast_node_fn_defn {
   sleek_ast_node* body;
 };
 
-struct sleek_ast_call_args {
-  enum sleek_args_type type;
-  sleek_ast_node* data;
-  struct sleek_ast_call_args* next;
-};
-
 struct sleek_ast_node_fn_call {
   sleek_string fn_name;
-  size_t arg_count;
-  struct sleek_ast_call_args* args;
+  struct sleek_args* args;
 };
 
 struct sleek_ast_node_literal {
