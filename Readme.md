@@ -5,7 +5,7 @@ A statically-typed, sleek, ergonomic, expressive, and modern programming languag
 
 Check out the [Docs](https://prakashniroula-dev.github.io/sleek)
 
-## First MWP (Working prototype) -- Achieved
+## First MWP (Minimum Working prototype) -- Achieved
 
 Compile/Transpile and run this piece of code
 
@@ -29,40 +29,40 @@ fn main() {
 ```yaml
 # AST preview
 [function_defn]:
-  name: main
-  return_type: 2
+  name: "main"
+  return_type: 2 (void)
   body:
     [function_call]:
-      name: print
-            args:
+      name: "print"
+      args:
         arg 0:
           [literal]:
-            type: 3
-            value: Hello Sleek!
+            type: 3 (string)
+            value: "Hello Sleek!"
         arg 1:
           [literal]:
-            type: 3
-            value:  (
+            type: 3 (string)
+            value: " ("
         arg 2:
           [literal]:
-            type: 4
+            type: 4 (integer)
             value: 5
         arg 3:
           [literal]:
-            type: 4
+            type: 4 (integer)
             value: 1
         arg 4:
           [literal]:
-            type: 4
+            type: 4 (integer)
             value: 3
         arg 5:
           [literal]:
-            type: 4
+            type: 4 (integer)
             value: 3
         arg 6:
           [literal]:
-            type: 3
-            value: K )
+            type: 3 (string)
+            value: "K )"
 ```
 
 ## How to run
