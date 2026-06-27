@@ -53,9 +53,10 @@ char sleek_peek_char(int idx)
 
 static void sleek_next_char()
 {
-  if (source_len <= 0)
+  if (source == NULL || source_len == 0)
   {
     sleek_warn("next char called when source length is 0");
+    current_char = '\0';
     return;
   }
   source++;
@@ -65,9 +66,8 @@ static void sleek_next_char()
 
 static void sleek_move_source(const char *newptr)
 {
-  size_t diff = newptr - source;
   source = newptr;
-  source_len = source_len - diff - 1;
+  source_len = strlen(source);
   current_char = *source;
 }
 

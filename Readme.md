@@ -5,13 +5,13 @@ A statically-typed, sleek, ergonomic, expressive, and modern programming languag
 
 Check out the [Docs](https://prakashniroula-dev.github.io/sleek)
 
-## Todos for first MWP (Working prototype) :
+## First MWP (Working prototype) -- Achieved
 
-Compile and run this piece of code
+Compile/Transpile and run this piece of code
 
 ```sleek
 fn main() {
-  print("Hello Sleek");
+  print("Hello Sleek!", " (", 5, 1, 3, 3, "K )");
 }
 ```
 
@@ -24,21 +24,45 @@ fn main() {
   - [x] identifiers - `print` | `main`
 
 - [x] Parser - parse to AST
+- [x] Transpiler - transpile to C code
 
 ```yaml
 # AST preview
-[function_defn]
-  name: "main"
-  args: 0
-  body: (linked_list, length=1)
-    [statement]
-      [call]
-        body:
-          fn_name: "print"
-          args: (linked_list, length=1)
-            0: [literal]
-              type: string
-              body: "Hello World"
+[function_defn]:
+  name: main
+  return_type: 2
+  body:
+    [function_call]:
+      name: print
+            args:
+        arg 0:
+          [literal]:
+            type: 3
+            value: Hello Sleek!
+        arg 1:
+          [literal]:
+            type: 3
+            value:  (
+        arg 2:
+          [literal]:
+            type: 4
+            value: 5
+        arg 3:
+          [literal]:
+            type: 4
+            value: 1
+        arg 4:
+          [literal]:
+            type: 4
+            value: 3
+        arg 5:
+          [literal]:
+            type: 4
+            value: 3
+        arg 6:
+          [literal]:
+            type: 3
+            value: K )
 ```
 
 ## How to run

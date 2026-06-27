@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <lexer.h>
 #include <parser.h>
+#include <transpiler.h>
+#include <stdlib.h>
 
 void print_sleek_token(sleek_tok tok) {
   if ( tok.type == sleek_tok_type_keyword ) {
@@ -84,13 +86,13 @@ void print_sleek_ast(sleek_ast_node* node, int level) {
   }
 }
 
-void lexerTest() {
-  const char* code = 
+const char* code = 
   "fn main() {\n"
-  "  printf(\"Hello Sleek\");"
+  "  print(\"Hello Sleek!\", \" (\", 5, 1, 3, 3, \"K )\");"
   "}"
   ;
 
+void lexerTest() {
   sleek_lex_init(code, NULL);
   sleek_tok tok = sleek_tok_invalid();
   while ((tok.type != sleek_tok_type_eof)) {
@@ -101,19 +103,53 @@ void lexerTest() {
 }
 
 void parserTest() {
-  const char* code = 
-  "fn main() {\n"
-  "  printf(\"Hello Sleek\", 5);"
-  "}"
-  ;
-
   sleek_ast_node* ast = sleek_parse(code);
   printf("\n=== AST ===\n");
   print_sleek_ast(ast, 0);
 }
 
-int main() {
+const char* transpilerTest() {
+  sleek_ast_node* ast = sleek_parse(code);
+  const char* output = transpile_ast(ast);
+  printf("\n=== Transpiled Output ===\n");
+  printf("%s\n", output);
+  return output;
+}
+
+void test() {
+  printf("=== Lexer Test ===\n");
   lexerTest();
+  printf("\n=== Parser Test ===\n");
   parserTest();
+  printf("\n=== Transpiler Test ===\n");
+  const char* output = transpilerTest();
+  printf("Saving transpiled output to 'output.c'\n");
+  FILE* f = fopen("output.c", "w");
+  if (f == NULL) {
+    printf("Error opening file for writing\n");
+    return;
+  }
+  fprintf(f, "%s", output);
+  fclose(f);
+  printf("Compilation Test: Compiling 'output.c'...\n");
+  int ret = system("gcc output.c -o output");
+  if (ret != 0) {
+    printf("Compilation failed with return code %d\n", ret);
+    return;
+  }
+  printf("Running compiled output...\n\n");
+  ret = system("output");
+  if (ret != 0) {
+    printf("Execution failed with return code %d\n", ret);
+    return;
+  }
+  printf("\nExecution completed successfully\n");
+  printf("Cleaning up: Removing 'output.c' and 'output'\n");
+  remove("output.c");
+  remove("output.exe");
+}
+
+int main() {
+  test();
   return 0;
 }
