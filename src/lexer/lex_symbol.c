@@ -1,8 +1,11 @@
 #include "./state.h"
 
+// used string comparison for symbols to support multiple character symbols
+// like +=, >=, <=, etc.
+
 static const struct
 {
-  const char *name;
+  const char *sym;
   enum sleek_symbol_types type;
 }
 symbols[] =
@@ -14,26 +17,26 @@ symbols[] =
   {",", sleek_symbol_type_comma},
   {";", sleek_symbol_type_semicolon},
   {"\"", sleek_symbol_type_dblquote},
-  {NULL, -1}
+  {NULL, -1} /* end indicator */
 };
 
 bool lex_symbol(sleek_tok *dest) {
   sleek_tok tok = INVALID_TOKEN;
   int idx;
-  for (idx = 0; symbols[idx].name != NULL; idx++)
+  for (idx = 0; symbols[idx].sym != NULL; idx++)
   {
-    const char *sm = symbols[idx].name;
+    const char *sm = symbols[idx].sym;
     if (strncmp(state.source, sm, strlen(sm)) == 0)
     {
       tok.type = sleek_tok_type_symbol;
       tok.data.symbol.type = symbols[idx].type;
-      move_source(state.source + strlen(sm));
       break;
     }
   }
   if (tok.type == sleek_tok_type_invalid)
-    return false;
+  return false;
+  sleek_report("lex_symbol", "parsed symbol: `%.*s` (type = %d)", (int)strlen(symbols[idx].sym), state.source, tok.data.symbol.type);
+  move_source(state.source + strlen(symbols[idx].sym));
   *dest = tok;
-  sleek_report("lex_symbol", "parsed symbol: %.*s(type = %d)", (int)strlen(symbols[idx].name), state.source, tok.data.symbol.type);
   return true;
 }
