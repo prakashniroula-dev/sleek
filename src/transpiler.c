@@ -70,7 +70,7 @@ static void transpile_ast_recursive(sleek_ast_node *node, int level)
     break;
   case sleek_ast_node_type_fn_call:
     
-    if (strncmp(node->data.fn_defn.fn_name.ptr, "print", node->data.fn_defn.fn_name.length) == 0)
+    if (strncmp(node->data.fn_defn.fn_name.ptr, "println", node->data.fn_defn.fn_name.length) == 0)
     {
       transpiler_emit("printf(\"");
       struct sleek_args *arg = node->data.fn_call.args;
@@ -118,7 +118,7 @@ static void transpile_ast_recursive(sleek_ast_node *node, int level)
     }
     break;
   default:
-    sleek_error("Unknown AST node type: %d", node->type);
+    sleek_error("transpile_ast_recursive", "Unknown AST node type: %d", node->type);
   }
 
   return transpile_ast_recursive(node->next, level);

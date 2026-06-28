@@ -43,7 +43,7 @@ bool expect_token(enum sleek_tok_type type, sleek_tok *dest)
   sleek_tok tok = sleek_peek_token(0);
   if (tok.type != type)
   {
-    sleek_error("Expected token of type %d but got %d", type, tok.type);
+    sleek_error("expected_token", "type %d, but got %d", type, tok.type);
     if (dest)
       *dest = sleek_tok_invalid();
     return false;
@@ -69,7 +69,7 @@ struct sleek_args* sleek_parse_args()
   sleek_tok tok = sleek_peek_token(0);
   if (tok.type != sleek_tok_type_symbol || tok.data.symbol.type != sleek_symbol_type_parantheses_l)
   {
-    sleek_error("Expected '(' at start of argument list");
+    sleek_error("expected_token", "Expected '(' at start of argument list");
     return NULL;
   }
   consume_token(1); // consume '('
@@ -83,7 +83,7 @@ struct sleek_args* sleek_parse_args()
     {
       if (tok.type != sleek_tok_type_symbol || tok.data.symbol.type != sleek_symbol_type_comma)
       {
-        sleek_error("Expected ',' between arguments");
+        sleek_error("expected_token", "Expected ',' between arguments");
         return NULL;
       }
       consume_token(1); // consume ','
@@ -91,7 +91,7 @@ struct sleek_args* sleek_parse_args()
     }
     if (tok.type != sleek_tok_type_literal)
     {
-      sleek_error("Expected literal argument");
+      sleek_error("expected_token", "Expected literal argument");
       return NULL;
     }
 
@@ -126,13 +126,13 @@ sleek_ast_node *sleek_parse_stmt()
   // currently only supports function calls
   sleek_tok tok = sleek_peek_token(0);
   sleek_tok tok1 = sleek_peek_token(1);
-  sleek_log("Peeking tokens in stmt: tok0 type=%d, tok1 type=%d", tok.type, tok1.type);
+  sleek_log("parse_stmt", "Peeking tokens in stmt: tok0 type=%d, tok1 type=%d", tok.type, tok1.type);
   if (match_token(sleek_tok_type_identifier) && tok1.type == sleek_tok_type_symbol && tok1.data.symbol.type == sleek_symbol_type_parantheses_l)
   {
     sleek_string fn_name = tok.data.identifier;
     consume_token(1); // consume identifier
     tok = sleek_peek_token(0);
-    sleek_log("Peeking token after consuming identifier: type=%d, %d", tok.type, tok.data.symbol.type);
+    sleek_log("parse_stmt", "Peeking token after consuming identifier: type=%d, %d", tok.type, tok.data.symbol.type);
     sleek_ast_node *node = arena_alloc(sizeof(sleek_ast_node));
     node->type = sleek_ast_node_type_fn_call;
     node->data.fn_call.fn_name = fn_name;
@@ -152,7 +152,7 @@ sleek_ast_node *sleek_parse_block()
   sleek_tok tok = sleek_peek_token(0);
   if (!expect_token(sleek_tok_type_symbol, &tok) || tok.data.symbol.type != sleek_symbol_type_braces_l)
   {
-    sleek_error("Expected '{' at start of block");
+    sleek_error("parse_block", "Expected '{' at start of block");
     return NULL;
   }
   sleek_ast_node *root = NULL;
@@ -180,7 +180,7 @@ sleek_ast_node *sleek_parse_block()
     }
     else
     {
-      sleek_error("Failed to parse statement in block");
+      sleek_error("parse_block", "Failed to parse statement in block");
       break;
     }
   }
@@ -194,13 +194,13 @@ sleek_ast_node *sleek_parse_fn_defn()
 
   if (!expect_token(sleek_tok_type_keyword, &tok) || tok.data.keyword.type != sleek_keyword_type_fn)
   {
-    sleek_error("Expected 'fn' keyword at start of function definition");
+    sleek_error("parse_fn_defn", "Expected 'fn' keyword at start of function definition");
     return NULL;
   }
 
   if (!expect_token(sleek_tok_type_identifier, &tok))
   {
-    sleek_error("Expected function name after 'fn' keyword");
+    sleek_error("parse_fn_defn", "Expected function name after 'fn' keyword");
     return NULL;
   }
 
@@ -211,7 +211,7 @@ sleek_ast_node *sleek_parse_fn_defn()
       !match_token(sleek_tok_type_symbol) ||
       tok.data.symbol.type != sleek_symbol_type_parantheses_l)
   {
-    sleek_error("Expected '(' after function name");
+    sleek_error("parse_fn_defn", "Expected '(' after function name");
     return NULL;
   }
   consume_token(1); // consume '('
@@ -222,14 +222,14 @@ sleek_ast_node *sleek_parse_fn_defn()
 
   if (!match_token(sleek_tok_type_symbol) || tok.data.symbol.type != sleek_symbol_type_parantheses_r)
   {
-    sleek_error("Expected ')' after function arguments");
+    sleek_error("parse_fn_defn", "Expected ')' after function arguments");
     return NULL;
   }
 
   consume_token(1); // consume ')'
 
   tok = sleek_peek_token(0);
-  sleek_log("Peeking token after function args: type=%d", tok.type);
+  sleek_log("parse_fn_defn", "Peeking token after function args: type=%d", tok.type);
   sleek_ast_node *node = arena_alloc(sizeof(sleek_ast_node));
   node->type = sleek_ast_node_type_fn_defn;
   node->data.fn_defn.fn_name = fn_name;
@@ -241,11 +241,11 @@ sleek_ast_node *sleek_parse_fn_defn()
 sleek_ast_node *sleek_parse_toplevel()
 {
   sleek_tok tok = sleek_peek_token(0);
-  sleek_log("Peeking token at toplevel: type=%d", tok.type);
+  sleek_log("parse_toplevel", "Peeking token at toplevel: type=%d", tok.type);
 
   if (!match_token(sleek_tok_type_keyword))
   {
-    sleek_error("Expected keyword at toplevel");
+    sleek_error("parse_toplevel", "Expected keyword at toplevel");
     return NULL;
   }
 
@@ -254,7 +254,7 @@ sleek_ast_node *sleek_parse_toplevel()
     return sleek_parse_fn_defn();
   }
 
-  sleek_error("Unexpected keyword at toplevel");
+  sleek_error("parse_toplevel", "Unexpected keyword at toplevel");
   return NULL;
 }
 
@@ -270,7 +270,7 @@ sleek_ast_node *sleek_parse(const char *source)
   while (true)
   {
     sleek_tok tok = sleek_peek_token(0);
-    sleek_log("Peeking token at toplevel: type=%d", tok.type);
+    sleek_log("parse_toplevel", "Peeking token at toplevel: type=%d", tok.type);
     if (tok.type == sleek_tok_type_eof)
       break;
     sleek_ast_node *node = sleek_parse_toplevel();
@@ -281,7 +281,7 @@ sleek_ast_node *sleek_parse(const char *source)
     }
     else
     {
-      sleek_error("Failed to parse toplevel node");
+      sleek_error("parse_toplevel", "Failed to parse toplevel node");
       break;
     }
   }

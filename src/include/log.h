@@ -34,56 +34,56 @@ static inline int sleek_log__spaces(int level) {
   "\n[line: " sleekm_line_str() "][" name "]: "
 
 // =========== Logging: Level 3 ===========
-#define sleek_log(args...) \
-  (sleek_log_level >= 3 ? printf(sleek_log_info("log") args): 0)
+#define sleek_log(topic, args...) \
+  (sleek_log_level >= 3 ? printf(sleek_log_info("log") "(" topic ") " args): 0)
   
 #define sleek_log_continue(level, args...) \
   (sleek_log_level >= 3 ? sleek_log__spaces(level) + printf("" args): 0)
 
-#define sleek_log_string(sleek_str) \
-  (sleek_log_level >= 3 ? sleek_log__string_fn(sleek_log_info("log"), sleek_str): 0)
+#define sleek_log_string(topic, sleek_str) \
+  (sleek_log_level >= 3 ? sleek_log__string_fn(sleek_log_info("log") "(" topic ") ", sleek_str): 0)
 
 #define sleek_log_string_continue(level, sleek_str) \
   (sleek_log_level >= 3 ? sleek_log__spaces(level) + sleek_log__string_fn("", sleek_str): 0)
 
 // ========== Warning: Level 2 ===========
   
-#define sleek_warn(args...) \
-  (sleek_log_level >= 2 ? printf(sleek_log_info("warn")  args): 0)
+#define sleek_warn(topic, args...) \
+  (sleek_log_level >= 2 ? printf(sleek_log_info("warn") "(" topic ") " args): 0)
   
 #define sleek_warn_continue(level, args...) \
   (sleek_log_level >= 2 ? sleek_log__spaces(level) + printf("" args): 0)
 
-#define sleek_warn_string(sleek_str) \
-  (sleek_log_level >= 2 ? sleek_log__string_fn(sleek_log_info("warn"), sleek_str): 0)
+#define sleek_warn_string(topic, sleek_str) \
+  (sleek_log_level >= 2 ? sleek_log__string_fn(sleek_log_info("warn") "(" topic ") ", sleek_str): 0)
   
   #define sleek_warn_string_continue(level, sleek_str) \
   (sleek_log_level >= 2 ? sleek_log__spaces(level) + sleek_log__string_fn("", sleek_str): 0)
 
 // ========== Errors: Level 1 =============
 
-#define sleek_error(args...) \
-  (sleek_log_level >= 1 ? printf(sleek_log_info("error") args): 0)
+#define sleek_error(topic, args...) \
+  (sleek_log_level >= 1 ? printf(sleek_log_info("error") "(" topic ") " args): 0)
 
 #define sleek_error_continue(level, args...) \
   (sleek_log_level >= 1 ? sleek_log__spaces(level) + printf("" args): 0)
 
-#define sleek_error_string(sleek_str) \
-  (sleek_log_level >= 1 ? sleek_log__string_fn(sleek_log_info("error"), sleek_str): 0)
+#define sleek_error_string(topic, sleek_str) \
+  (sleek_log_level >= 1 ? sleek_log__string_fn(sleek_log_info("error") "(" topic ") ", sleek_str): 0)
 
 #define sleek_error_string_continue(level, sleek_str) \
   (sleek_log_level >= 1 ? sleek_log__spaces(level) + sleek_log__string_fn("", sleek_str): 0)
 
 // =========== Everything: Level 4 ==============
 
-#define sleek_report(args...) \
-  (sleek_log_level >= 4 ? printf(sleek_log_info("verbose") args): 0)
+#define sleek_report(topic, args...) \
+  (sleek_log_level >= 4 ? printf(sleek_log_info("verbose") "(" topic ") " args): 0)
 
 #define sleek_report_continue(level, args...) \
   (sleek_log_level >= 4 ? sleek_log__spaces(level) + printf("" args): 0)
 
-#define sleek_report_string(sleek_str) \
-  (sleek_log_level >= 4 ? sleek_log__string_fn(sleek_log_info("verbose"), sleek_str): 0)
+#define sleek_report_string(topic, sleek_str) \
+  (sleek_log_level >= 4 ? sleek_log__string_fn(sleek_log_info("verbose") "(" topic ") ", sleek_str): 0)
 
 #define sleek_report_string_continue(level, sleek_str) \
   (sleek_log_level >= 4 ? sleek_log__spaces(level) + sleek_log__string_fn("", sleek_str): 0)

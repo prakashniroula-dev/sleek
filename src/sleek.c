@@ -88,7 +88,7 @@ void print_sleek_ast(sleek_ast_node* node, int level) {
 
 const char* code = 
   "fn main() {\n"
-  "  print(\"Hello Sleek!\", \" (\", 5, 1, 3, 3, \"K )\");"
+  "  println(\"\\\"Hello Sleek!\\\"\", \"(\", 5, 1, 3, 3, \"K )\");\n"
   "}"
   ;
 
@@ -117,6 +117,8 @@ const char* transpilerTest() {
 }
 
 void test() {
+  printf("=== Sleek Code ===\n");
+  printf("%s\n\n", code);
   printf("=== Lexer Test ===\n");
   lexerTest();
   printf("\n=== Parser Test ===\n");
