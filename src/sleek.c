@@ -6,28 +6,28 @@
 
 void print_sleek_token(sleek_tok tok) {
   if ( tok.type == sleek_tok_type_keyword ) {
-    printf("Keyword: %d\n", tok.data.keyword.type);
+    printf("\nKeyword: %d", tok.data.keyword.type);
   }
   else if ( tok.type == sleek_tok_type_identifier ) {
-    printf("Identifier: %.*s\n", (int)tok.data.identifier.length, tok.data.identifier.ptr);
+    printf("\nIdentifier: %.*s", (int)tok.data.identifier.length, tok.data.identifier.ptr);
   }
   else if ( tok.type == sleek_tok_type_symbol ) {
-    printf("Symbol: %d\n", tok.data.symbol.type);
+    printf("\nSymbol: %d", tok.data.symbol.type);
   }
   else if ( tok.type == sleek_tok_type_literal ) {
-    printf("Literal: %d\n", tok.data.literal.type);
+    printf("\nLiteral: %d", tok.data.literal.type);
     if (tok.data.literal.type == sleek_args_type_int64) {
-      printf("  Value: %lld\n", tok.data.literal.data._int64);
+      printf("\n  Value: %lld", tok.data.literal.data._int64);
     }
     else if (tok.data.literal.type == sleek_args_type_string) {
-      printf("  Value: %.*s\n", (int)tok.data.literal.data._string.length, tok.data.literal.data._string.ptr);
+      printf("\n  Value: %.*s", (int)tok.data.literal.data._string.length, tok.data.literal.data._string.ptr);
     }
   }
   else if ( tok.type == sleek_tok_type_eof ) {
-    printf("End of File\n");
+    printf("\nEnd of File");
   }
   else {
-    printf("Invalid Token\n");
+    printf("\nInvalid Token");
   }
 }
 
@@ -98,6 +98,7 @@ void lexerTest() {
   while ((tok.type != sleek_tok_type_eof)) {
     tok = sleek_peek_token(0);
     print_sleek_token(tok);
+    printf("\n");
     sleek_advance_token();
   }
 }
