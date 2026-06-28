@@ -143,6 +143,8 @@ sleek_ast_node *sleek_parse_stmt()
       consume_token(1); // consume ';'
     }
     return node;
+  } else {
+    sleek_error("parse_stmt", "Unsupported token type: %d", tok.type);
   }
   return NULL;
 }
@@ -184,6 +186,7 @@ sleek_ast_node *sleek_parse_block()
       break;
     }
   }
+  sleek_report("parse_block", "Parsed block with %s statements", (root == NULL) ? "no" : "some");
   return root;
 }
 
@@ -241,7 +244,7 @@ sleek_ast_node *sleek_parse_fn_defn()
 sleek_ast_node *sleek_parse_toplevel()
 {
   sleek_tok tok = sleek_peek_token(0);
-  sleek_log("parse_toplevel", "Peeking token at toplevel: type=%d", tok.type);
+  sleek_log("parse_toplevel", "parsing top level token, type=%d", tok.type);
 
   if (!match_token(sleek_tok_type_keyword))
   {
@@ -251,7 +254,14 @@ sleek_ast_node *sleek_parse_toplevel()
 
   if (tok.data.keyword.type == sleek_keyword_type_fn)
   {
-    return sleek_parse_fn_defn();
+    sleek_ast_node* r = sleek_parse_fn_defn();
+    sleek_report(
+      "parse_toplevel", "parsed function definition: %.*s, with %s body",
+      (int)r->data.fn_defn.fn_name.length,
+      r->data.fn_defn.fn_name.ptr,
+      r->data.fn_defn.body ? "some" : "no"
+    );
+    return r;
   }
 
   sleek_error("parse_toplevel", "Unexpected keyword at toplevel");
